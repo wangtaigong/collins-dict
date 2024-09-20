@@ -2,6 +2,7 @@
 import debounce from 'lodash.debounce';
 import { ref, watch } from 'vue'
 
+const dictRef = ref()
 const dict = ref('')
 const collinsHtml = ref('')
 watch(dict, () => {
@@ -15,6 +16,12 @@ async function fetchDict() {
   const res = await window.electron.ipcRenderer.invoke('fetchDict', word)
   collinsHtml.value = res || `没有找到该单词：${word}`
 }
+
+function dictFocus () {
+  console.log('dictFocus')
+  dictRef.value.focus()
+}
+window.electron.ipcRenderer.on('focus-input', dictFocus)
 </script>
 
 <template>
@@ -22,7 +29,13 @@ async function fetchDict() {
     <div class="content">
       <Form ref="formInline" style="padding: 0 10px" @submit.prevent>
         <FormItem prop="user">
-          <Input v-model="dict" type="text" search placeholder="请输入要查询的英文单词"></Input>
+          <Input
+            ref="dictRef"
+            v-model="dict"
+            type="text"
+            search
+            placeholder="请输入要查询的英文单词"
+          ></Input>
         </FormItem>
       </Form>
       <div class="result customizeScroll">

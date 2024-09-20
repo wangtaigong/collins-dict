@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, globalShortcut } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -21,9 +21,9 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
+  // mainWindow.on('ready-to-show', () => {
+  //   mainWindow.show()
+  // })
 
   mainWindow.on('close', (ev) => {
     ev.preventDefault()
@@ -44,6 +44,19 @@ function createWindow(): void {
   }
 
   new AppTray(mainWindow)
+
+  globalShortcut.register('Alt+W', () => {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+    }
+    if (!mainWindow.isFocused()) {
+      mainWindow.focus()
+    }
+    if (!mainWindow.isVisible()) {
+      mainWindow.show()
+    }
+    mainWindow.webContents.send('focus-input')
+  })
 }
 
 // This method will be called when Electron has finished
